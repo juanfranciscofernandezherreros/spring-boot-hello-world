@@ -1,7 +1,0 @@
-com/testing/HelloWorldController.class
-com/testing/ProductoController.class
-com/testing/HelloWorldApplication.class
-com/testing/service/ProductoServiceImpl.class
-com/testing/service/ProductoService.class
-com/testing/repository/ProductoRepository.class
-com/testing/entity/Producto.class
