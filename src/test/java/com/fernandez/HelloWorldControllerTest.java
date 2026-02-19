@@ -1,6 +1,6 @@
-package com.testing;
+package com.fernandez;
 
-import static com.testing.HelloWorldController.MESSAGE_KEY;
+import static com.fernandez.HelloWorldController.MESSAGE_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.net.UnknownHostException;

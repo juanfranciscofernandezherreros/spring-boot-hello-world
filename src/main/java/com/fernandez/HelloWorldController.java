@@ -1,4 +1,4 @@
-package com.testing;
+package com.fernandez;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.springframework.http.MediaType;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,8 +27,11 @@ public class HelloWorldController {
     public static final String MESSAGE_KEY = "message";
     public static final String HOSTNAME_KEY = "hostname";
     public static final String IP_KEY = "ip";
+    
+    @Value("${app.hello.message}")
+    private String helloMessage;
 
-    @GetMapping(path = "/", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @GetMapping(path = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     public Map<String, String> helloWorld() throws UnknownHostException {
         return getResponse();
     }
@@ -36,7 +40,7 @@ public class HelloWorldController {
         String host = InetAddress.getLocalHost().getHostName();
         String ip = InetAddress.getLocalHost().getHostAddress();
         Map<String, String> response = new HashMap<>();
-        response.put(MESSAGE_KEY, "Hello World!");
+        response.put(MESSAGE_KEY, helloMessage);
         response.put(HOSTNAME_KEY, host);
         response.put(IP_KEY, ip);
         LOG.info("Returning {}", response);
