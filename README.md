@@ -1,17 +1,14 @@
-# Spring Boot Hello World + Producto API
+# Spring Boot Hello World
 
 Proyecto Spring Boot con:
 
 - **Java 17** (compilación) / JRE 21 (runtime Docker — compatible por retrocompatibilidad de bytecode)
 - **Spring Boot 3.2.5** + Spring Cloud 2023.0.1
-- Arquitectura hexagonal (aplicada al módulo `Producto`)
-- CRUD de `Producto` + filtros por todos los campos
 - Planificación dinámica de tareas HTTP (cron configurable por properties)
-- MapStruct 1.5.5 + Lombok 1.18.32
+- Lombok 1.18.32
 - AOP para logging de peticiones
 - Tests unitarios e integración (JUnit 4/5 + Mockito + MockMvc)
 - Perfiles por entorno (`dev`, `int`, `qa`, `prod`) + fichero de entorno
-- H2 como base de datos en memoria
 - Docker listo para `build` y `run`
 
 ---
@@ -36,36 +33,18 @@ spring-boot-hello-world/
     │   ├── java/com/fernandez/
     │   │   ├── HelloWorldApplication.java          # Punto de entrada
     │   │   ├── HelloWorldController.java           # GET /
-    │   │   ├── ProductoController.java             # REST API Producto
     │   │   ├── aop/
     │   │   │   └── RequestLoggingAspect.java       # Logging AOP
-    │   │   ├── application/port/
-    │   │   │   ├── in/ProductoUseCase.java         # Puerto de entrada
-    │   │   │   └── out/ProductoPersistencePort.java # Puerto de salida
     │   │   ├── constants/
     │   │   │   └── UrlConstants.java
-    │   │   ├── dto/
-    │   │   │   └── ProductoDto.java
-    │   │   ├── entity/
-    │   │   │   └── Producto.java                   # Entidad JPA
     │   │   ├── exception/
-    │   │   │   ├── ApiExceptionHandler.java        # Handler global
-    │   │   │   └── ProductoNotFoundException.java
-    │   │   ├── infrastructure/persistence/
-    │   │   │   └── ProductoPersistenceAdapter.java  # Adaptador hexagonal
-    │   │   ├── mapper/
-    │   │   │   └── ProductoMapper.java             # MapStruct
-    │   │   ├── repository/
-    │   │   │   └── ProductoRepository.java         # Spring Data JPA
-    │   │   ├── scheduler/
-    │   │   │   ├── config/
-    │   │   │   │   ├── SchedulerConfig.java        # TaskScheduler bean
-    │   │   │   │   └── SchedulerTaskProperties.java # Config properties
-    │   │   │   └── service/
-    │   │   │       └── DynamicSchedulerService.java # Planificador dinámico
-    │   │   └── service/
-    │   │       ├── ProductoService.java            # Interfaz
-    │   │       └── ProductoServiceImpl.java        # Implementación
+    │   │   │   └── ApiExceptionHandler.java        # Handler global
+    │   │   └── scheduler/
+    │   │       ├── config/
+    │   │       │   ├── SchedulerConfig.java        # TaskScheduler bean
+    │   │       │   └── SchedulerTaskProperties.java # Config properties
+    │   │       └── service/
+    │   │           └── DynamicSchedulerService.java # Planificador dinámico
     │   └── resources/
     │       ├── application.properties              # Configuración base
     │       ├── application-dev.properties
@@ -77,8 +56,6 @@ spring-boot-hello-world/
         └── java/com/fernandez/
             ├── HelloWorldControllerTest.java
             ├── HelloWorldIntegrationTest.java
-            ├── ProductoControllerIntegrationTest.java
-            ├── ProductoServiceImplTest.java
             └── scheduler/
                 ├── DynamicSchedulerServiceTest.java
                 └── SchedulerTaskPropertiesTest.java
@@ -86,38 +63,11 @@ spring-boot-hello-world/
 
 ---
 
-## 3) Arquitectura hexagonal
-
-Se estructuró el flujo de `Producto` en capas hexagonales:
-
-```
-┌──────────────────────────────────────────────────────┐
-│  WEB (Adaptador entrada)                             │
-│  ProductoController → REST API                       │
-└──────────────┬───────────────────────────────────────┘
-               │
-┌──────────────▼───────────────────────────────────────┐
-│  APLICACIÓN (Casos de uso)                           │
-│  ProductoUseCase (puerto entrada)                    │
-│  ProductoServiceImpl (servicio)                      │
-└──────────────┬───────────────────────────────────────┘
-               │
-┌──────────────▼───────────────────────────────────────┐
-│  PERSISTENCIA (Puerto salida)                        │
-│  ProductoPersistencePort (interfaz)                  │
-│  ProductoPersistenceAdapter (adaptador)              │
-│  ProductoRepository (Spring Data JPA → H2)           │
-└──────────────────────────────────────────────────────┘
-```
-
-Clases de soporte:
+## 3) Clases de soporte
 
 | Clase | Paquete | Función |
 |-------|---------|---------|
-| `ProductoDto` | `dto` | Objeto de transferencia para la API |
-| `ProductoMapper` | `mapper` | Mapeo Producto ↔ ProductoDto (MapStruct) |
 | `ApiExceptionHandler` | `exception` | Handler global `@RestControllerAdvice` |
-| `ProductoNotFoundException` | `exception` | Excepción 404 personalizada |
 | `RequestLoggingAspect` | `aop` | Logging AOP de peticiones entrantes/salientes |
 | `UrlConstants` | `constants` | Constantes de rutas URL |
 
@@ -200,9 +150,6 @@ java --add-opens java.base/java.lang=ALL-UNNAMED \
 # Ejecutar todos los tests
 mvn test
 
-# Ejecutar un test específico
-mvn test -Dtest=ProductoControllerIntegrationTest
-
 # Ejecutar tests del scheduler
 mvn test -Dtest=DynamicSchedulerServiceTest
 ```
@@ -226,78 +173,6 @@ Respuesta de ejemplo:
   "message": "Hello World!"
 }
 ```
-
-### 6.2 Producto API
-
-Base URL: `http://localhost:8080/api/productos`
-
-#### Crear producto
-
-```bash
-curl -X POST http://localhost:8080/api/productos \
-  -H "Content-Type: application/json" \
-  -d '{
-    "nombre": "Laptop",
-    "descripcion": "Ultrabook",
-    "precio": 1299.99,
-    "stock": 5
-  }'
-```
-
-Respuesta (`201 Created`):
-
-```json
-{
-  "id": 1,
-  "nombre": "Laptop",
-  "descripcion": "Ultrabook",
-  "precio": 1299.99,
-  "stock": 5
-}
-```
-
-#### Listar todos
-
-```bash
-curl http://localhost:8080/api/productos
-```
-
-#### Filtrar por campos
-
-```bash
-curl "http://localhost:8080/api/productos?id=1&nombre=lap&descripcion=ultra&precio=1299.99&stock=5"
-```
-
-Todos los parámetros de filtro son opcionales y se combinan entre sí.
-
-#### Buscar por id
-
-```bash
-curl http://localhost:8080/api/productos/1
-```
-
-Si no existe, devuelve `404` con mensaje de error.
-
-#### Actualizar
-
-```bash
-curl -X PUT http://localhost:8080/api/productos/1 \
-  -H "Content-Type: application/json" \
-  -d '{
-    "nombre": "Laptop",
-    "descripcion": "Ultrabook Pro",
-    "precio": 1399.99,
-    "stock": 3
-  }'
-```
-
-#### Borrar
-
-```bash
-curl -X DELETE http://localhost:8080/api/productos/1
-```
-
-Respuesta esperada: `204 No Content`
 
 ---
 
@@ -395,8 +270,6 @@ El proyecto incluye tests unitarios e integración:
 |---------------|------|--------------|
 | `HelloWorldControllerTest` | Unitario | Respuesta del controlador HelloWorld |
 | `HelloWorldIntegrationTest` | Integración | GET `/` devuelve "Hello World!" (MockMvc) |
-| `ProductoControllerIntegrationTest` | Integración | CRUD completo + filtros (MockMvc) |
-| `ProductoServiceImplTest` | Unitario | Lógica de servicio con Mockito |
 | `DynamicSchedulerServiceTest` | Unitario | Planificación, cancelación y ejecución de tareas |
 | `SchedulerTaskPropertiesTest` | Integración | Binding de properties a configuración |
 
