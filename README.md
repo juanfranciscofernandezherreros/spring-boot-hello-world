@@ -2,7 +2,7 @@
 
 Proyecto Spring Boot con:
 
-- **Java 17** (compilación) / JRE 21 (runtime Docker)
+- **Java 17** (compilación) / JRE 21 (runtime Docker — compatible por retrocompatibilidad de bytecode)
 - **Spring Boot 3.2.5** + Spring Cloud 2023.0.1
 - Arquitectura hexagonal (aplicada al módulo `Producto`)
 - CRUD de `Producto` + filtros por todos los campos
@@ -323,16 +323,16 @@ component-config.dynamic-scheduling.tasks.alert.url=https://localhost:8443/api/e
 
 ### Tareas preconfiguradas
 
-| Tarea | Cron | Horario | URL |
-|-------|------|---------|-----|
-| `alert` | `0 0/30 * * * *` | Cada 30 minutos | `.../api/sla/status-advice-feedback` |
-| `item33` | `0 0 8 * * MON-FRI` | 08:00 L-V | `.../api/item/item33` |
-| `item35` | `0 0 7 * * MON-FRI` | 07:00 L-V | `.../api/item/item35` |
-| `item36` | `0 0 8 * * MON-FRI` | 08:00 L-V | `.../api/item/item36` |
-| `alert-eof-started-customer` | `0 0 3 * * 2-6` | 03:00 Mar-Sáb | `.../api/sla/end-of-day` |
-| `alert-eof-started-authority` | `0 0 7 * * 2-6` | 07:00 Mar-Sáb | `.../api/sla/end-of-day` |
-| `alert-eof-customer` | `0 0 6 * * 2-6` | 06:00 Mar-Sáb | `.../api/sla/end-of-day` |
-| `alert-eof-authority` | `0 0 12 * * 2-6` | 12:00 Mar-Sáb | `.../api/sla/end-of-day` |
+| Tarea | Cron | Horario | URL destino |
+|-------|------|---------|-------------|
+| `alert` | `0 0/30 * * * *` | Cada 30 minutos | `https://localhost:8443/observability-alert-observer/api/sla/status-advice-feedback` |
+| `item33` | `0 0 8 * * MON-FRI` | 08:00 L-V | `https://localhost:8443/observability-item-orchestrator/api/item/item33` |
+| `item35` | `0 0 7 * * MON-FRI` | 07:00 L-V | `https://localhost:8443/observability-item-orchestrator/api/item/item35` |
+| `item36` | `0 0 8 * * MON-FRI` | 08:00 L-V | `https://localhost:8443/observability-item-orchestrator/api/item/item36` |
+| `alert-eof-started-customer` | `0 0 3 * * 2-6` | 03:00 Mar-Sáb | `https://localhost:8443/observability-alert-observer/api/sla/end-of-day` |
+| `alert-eof-started-authority` | `0 0 7 * * 2-6` | 07:00 Mar-Sáb | `https://localhost:8443/observability-alert-observer/api/sla/end-of-day` |
+| `alert-eof-customer` | `0 0 6 * * 2-6` | 06:00 Mar-Sáb | `https://localhost:8443/observability-alert-observer/api/sla/end-of-day` |
+| `alert-eof-authority` | `0 0 12 * * 2-6` | 12:00 Mar-Sáb | `https://localhost:8443/observability-alert-observer/api/sla/end-of-day` |
 
 ### Arquitectura del scheduler
 
